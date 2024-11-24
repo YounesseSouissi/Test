@@ -1,144 +1,297 @@
-import React, { useState } from 'react';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import { 
-  ClassicEditor, 
-  Bold, 
-  Essentials, 
-  Italic, 
-  Underline, 
-  Link, 
-  List, 
-  Paragraph, 
-  Undo, 
-  Font, 
-  Image, 
-  ImageToolbar, 
-  ImageCaption, 
-  ImageStyle, 
-  ImageUpload 
-} from 'ckeditor5';
+import { useCallback, useState } from 'react'
+import RichTextEditor, {
+  Attachment,
+  BaseKit,
+  Blockquote,
+  Bold,
+  BulletList,
+  Clear,
+  Code,
+  CodeBlock,
+  Color,
+  ColumnActionButton,
+  Emoji,
+  Excalidraw,
+  ExportPdf,
+  ExportWord,
+  FontFamily,
+  FontSize,
+  FormatPainter,
+  Heading,
+  Highlight,
+  History,
+  HorizontalRule,
+  Iframe,
+  Image,
+  ImageGif,
+  ImportWord,
+  Indent,
+  Italic,
+  Katex,
+  LineHeight,
+  Link,
+  Mention,
+  Mermaid,
+  MoreMark,
+  OrderedList,
+  SearchAndReplace,
+  SlashCommand,
+  Strike,
+  Table,
+  TableOfContents,
+  TaskList,
+  TextAlign,
+  TextDirection,
+  Twitter,
+  Underline,
+  Video,
+  locale,
+} from 'reactjs-tiptap-editor'
 
-import 'ckeditor5/ckeditor5.css';
+import 'reactjs-tiptap-editor/style.css'
+import 'katex/dist/katex.min.css'
+function convertBase64ToBlob(base64) {
+  const arr = base64.split(',')
+  const mime = arr[0].match(/:(.*?);/)[1]
+  const bstr = atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new Blob([u8arr], { type: mime })
+} 
+function extractImageUrls(content) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, 'text/html');
+  const images = doc.querySelectorAll('img');
+  return Array.from(images).map((img) => img.src);
+}
 
-const TextEditor = () => {
-  const [editorData, setEditorData] = useState('<p>Écrivez votre texte ici...</p>');
+function debounce(func, wait) {
+  let timeout
+  return function (...args) {
+    clearTimeout(timeout)
+    // @ts-ignore
+    timeout = setTimeout(() => func.apply(this, args), wait)
+  }
+}
+const extensions = [
+  BaseKit.configure({
+    placeholder: {
+      showOnlyCurrent: true,
+    },
+    characterCount: {
+      limit: 50_000,
+    },
+  }),
+  History,
+  SearchAndReplace,
+  TableOfContents,
+  FormatPainter.configure({ spacer: true }),
+  Clear,
+  FontFamily,
+  Heading.configure({ spacer: true }),
+  FontSize,
+  Bold,
+  Italic,
+  Underline,
+  Strike,
+  MoreMark,
+  Katex,
+  Emoji,
+  Color.configure({ spacer: true }),
+  Highlight,
+  BulletList,
+  OrderedList,
+  TextAlign.configure({ types: ['heading', 'paragraph'], spacer: true }),
+  Indent,
+  LineHeight,
+  TaskList.configure({
+    spacer: true,
+    taskItem: {
+      nested: true,
+    },
+  }),
+  Link,
+  Image.configure({
+    upload: (files) => {
+      return   new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append('image', files);
+      
+        fetch('http://localhost:8000/api/images', {
+          method: 'POST',
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            if (result.url) {
+              resolve(result.url); // Resolve with just the URL string
+            } else {
+              reject(result.error || 'Upload failed');
+            }
+          })
+          .catch((error) => {
+            reject(error.message || 'Upload error');
+          });
+      });
+      
+     
+      
+      
+    },
+    
+  }),
+  Video.configure({
+    upload: (files) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(URL.createObjectURL(files))
+        }, 500)
+      })
+    },
+  }),
+  ImageGif.configure({
+    GIPHY_API_KEY: import.meta.env.VITE_GIPHY_API_KEY ,
+  }),
+  Blockquote,
+  SlashCommand,
+  HorizontalRule,
+  Code.configure({
+    toolbar: false,
+  }),
+  CodeBlock.configure({ defaultTheme: 'dracula' }),
+  ColumnActionButton,
+  Table,
+  Iframe,
+  ExportPdf.configure({ spacer: true }),
+  ImportWord.configure({
 
-  const config = {
-    toolbar: {
-      items: [
-        'undo', '|',
-        'bold', 'italic', 'underline', '|',
-        'fontSize', 'fontFamily', 'fontColor', '|',
-        'bulletedList', 'numberedList', '|',
-        'link', 'imageUpload', '|',
-        
-      ],
+    upload: (files) => {
+      const f = files.map(file => ({
+        src: URL.createObjectURL(file),
+        alt: file.name,
+      }))
+      return Promise.resolve(f)
     },
-    plugins: [
-      Essentials,
-      Bold,
-      Italic,
-      Underline,
-      Link,
-      List,
-      Paragraph,
-      Undo,
-      Font,
-      Image,
-      ImageToolbar,
-      ImageCaption,
-      ImageStyle,
-      ImageUpload
-    ],
-    fontFamily: {
-      options: [
-        'default',
-        'Arial, Helvetica, sans-serif',
-        'Courier New, Courier, monospace',
-        'Georgia, serif',
-        'Times New Roman, Times, serif',
-        'Verdana, Geneva, sans-serif'
-      ],
-    },
-    fontSize: {
-      options: ['tiny', 'small', 'default', 'big', 'huge'],
-    },
-    fontColor: {
-      columns: 5,
-      documentColors: 10,
-    },
-    image: {
-      toolbar: ['imageTextAlternative', '|', 'imageStyle:full', 'imageStyle:side'],
-    },
-  };
+  }),
+  ExportWord,
+  Excalidraw,
+  TextDirection,
+  Mention,
+  Attachment.configure({
+    upload: (file) => {
+      // fake upload return base 64
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
 
-  // Custom upload adapter to handle image uploa
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const blob = convertBase64ToBlob(reader.result)
+          resolve(URL.createObjectURL(blob))
+        }, 300)
+      })
+    },
+  }),
+  Mermaid.configure({
+    upload: (file) => {
+      // fake upload return base 64
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
 
-  // Add the custom upload adapter to the editor
-  const uploadAdapterPlugin = (editor) => {
-    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-      return new MyUploadAdapter(loader);
-    };
-  };
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const blob = convertBase64ToBlob(reader.result )
+          resolve(URL.createObjectURL(blob))
+        }, 300)
+      })
+    },
+  }),
+  Twitter,
+]
+function TextEditor() {
+  const [content, setContent] = useState('')
+  const [theme, setTheme] = useState('light')
+  const [disable, setDisable] = useState(false)
+
+  const onValueChange = useCallback(
+    debounce((value) => {
+      // Détecter et gérer les suppressions d'images
+      const currentImages = extractImageUrls(value);
+      const previousImages = extractImageUrls(content);
+
+      // Identifier les images supprimées
+      const deletedImages = previousImages.filter(
+        (url) => !currentImages.includes(url)
+      );
+
+      // Supprimer chaque image côté serveur
+      deletedImages.forEach((url) => {
+        fetch('http://localhost:8000/api/images/delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Erreur lors de la suppression de l’image');
+            }
+            console.log(`Image supprimée: ${url}`);
+          })
+          .catch((error) => {
+            console.error('Erreur lors de la suppression de l’image:', error);
+          });
+      });
+
+      setContent(value); // Mettre à jour le contenu
+    }, 300),
+    [content]
+  );
 
   return (
-    <div style={{ margin: '20px' }}>
-      <h2>Éditeur de Texte</h2>
-      <CKEditor
-        editor={ClassicEditor}
-        config={{
-          ...config,
+    <div
+      className="p-[24px] flex flex-col w-full max-w-screen-lg gap-[24px] mx-[auto] my-0"
+      style={{
+        maxWidth: 1024,
+        margin: '40px auto',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          gap: '12px',
+          marginTop: '100px',
+          marginBottom: 10,
         }}
-        data={editorData}
-        onChange={(event, editor) => {
-          const data = editor.getData();
-          setEditorData(data);
-        }}
+      >
+        <button type="button" onClick={() => locale.setLang('vi')}>Vietnamese</button>
+        <button type="button" onClick={() => locale.setLang('en')}>English</button>
+        <button type="button" onClick={() => locale.setLang('zh_CN')}>Chinese</button>
+        <button type="button" onClick={() => locale.setLang('pt_BR')}>Português</button>
+        <button type="button" onClick={() => locale.setLang('hu_HU')}>Hungarian</button>
+        <button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+          {theme === 'dark' ? 'Light' : 'Dark'}
+        </button>
+        <button type="button" onClick={() => setDisable(!disable)}>{disable ? 'Editable' : 'Readonly'}</button>
+      </div>
+
+      <RichTextEditor
+        output="html"
+        content={content }
+        onChangeContent={onValueChange}
+        extensions={extensions}
+        dark={theme === 'dark'}
+        disabled={disable}
       />
 
-      <div style={{ marginTop: '20px' }}>
-        <h3>Contenu de l'éditeur :</h3>
-        <div dangerouslySetInnerHTML={{ __html: editorData }} />
-      </div>
+      {typeof content === 'string' && (
+              <div style={{ marginTop: 20 ,height: 200,width: '100%'}} dangerouslySetInnerHTML={{ __html: content }} />
+          )}
     </div>
-  );
-};
+  )
+}
 
-export default TextEditor;
-  class MyUploadAdapter {
-    constructor(loader) {
-      this.loader = loader;
-    }
-
-    // Simulates the upload process
-    upload() {
-      return this.loader.file
-        .then((file) => new Promise((resolve, reject) => {
-          const formData = new FormData();
-          formData.append('image', file);
-
-          fetch('https://your-server.com/upload', {
-            method: 'POST',
-            body: formData,
-          })
-            .then((response) => response.json())
-            .then((result) => {
-              if (result.url) {
-                resolve({
-                  default: result.url, // URL to be used in the image src
-                });
-              } else {
-                reject(result.error || 'Upload failed');
-              }
-            })
-            .catch((error) => {
-              reject(error.message || 'Upload error');
-            });
-        }));
-    }
-
-    // Optional: Called when the upload is aborted
-    abort() {
-      console.log('Upload aborted');
-    }
-  }
+export default TextEditor
