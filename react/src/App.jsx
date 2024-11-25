@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import CreateBlog from './pages/CreateBlog'
-import Login from './components/Login'
+import Login from './pages/Login'
 
 
 function App() {
