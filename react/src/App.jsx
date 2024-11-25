@@ -1,10 +1,22 @@
 import React from 'react'
-import TextEditor from './TextEditor'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import Layout from './components/Layout'
+import Home from './pages/Home'
+import CreateBlog from './pages/CreateBlog'
 
-export default function App() {
+
+function App() {
   return (
-    <div>
-      <TextEditor />
-    </div>
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/create-blog" element={<CreateBlog />} />
+        </Routes>
+      </Layout>
+    </Router>
   )
 }
+
+export default App
+

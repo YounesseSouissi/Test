@@ -210,11 +210,10 @@ const extensions = [
   }),
   Twitter,
 ]
-function TextEditor() {
+function TextEditor({onChange}) {
   const [content, setContent] = useState('')
   const [theme, setTheme] = useState('light')
   const [disable, setDisable] = useState(false)
-
   const onValueChange = useCallback(
     debounce((value) => {
       // Détecter et gérer les suppressions d'images
@@ -246,38 +245,20 @@ function TextEditor() {
           });
       });
 
-      setContent(value); // Mettre à jour le contenu
+      setContent(value);
+      onChange(value)
     }, 300),
+
     [content]
   );
 
   return (
     <div
-      className="p-[24px] flex flex-col w-full max-w-screen-lg gap-[24px] mx-[auto] my-0"
+      className="flex flex-col w-full max-w-screen-lg gap-[24px]  my-0"
       style={{
         maxWidth: 1024,
-        margin: '40px auto',
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          gap: '12px',
-          marginTop: '100px',
-          marginBottom: 10,
-        }}
-      >
-        <button type="button" onClick={() => locale.setLang('vi')}>Vietnamese</button>
-        <button type="button" onClick={() => locale.setLang('en')}>English</button>
-        <button type="button" onClick={() => locale.setLang('zh_CN')}>Chinese</button>
-        <button type="button" onClick={() => locale.setLang('pt_BR')}>Português</button>
-        <button type="button" onClick={() => locale.setLang('hu_HU')}>Hungarian</button>
-        <button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-          {theme === 'dark' ? 'Light' : 'Dark'}
-        </button>
-        <button type="button" onClick={() => setDisable(!disable)}>{disable ? 'Editable' : 'Readonly'}</button>
-      </div>
-
       <RichTextEditor
         output="html"
         content={content }
