@@ -5,7 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExamenController as AdminExamenController;
 use App\Http\Controllers\Admin\ModuleController as AdminModuleController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
-use App\Http\Controllers\admin\UserController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ChapitreController;
 use App\Http\Controllers\ExamenController;
 use App\Http\Controllers\ModuleController;
