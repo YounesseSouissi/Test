@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('difficulty', ['Facile', 'Moyen', 'Difficile']);
             $table->foreignIdFor(User::class,'user_id')->nullable()->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->foreignIdFor(Chapitre::class,'chapitre_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
-            $table->json('reponses');
+            $table->text('reponses');
             $table->timestamps();
         });
     }
