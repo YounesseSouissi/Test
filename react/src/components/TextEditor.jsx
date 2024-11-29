@@ -214,6 +214,13 @@ function TextEditor({onChange}) {
   const [content, setContent] = useState('')
   const [theme, setTheme] = useState('light')
   const [disable, setDisable] = useState(false)
+  const [key, setKey] = useState(0); // Ajout d'une clé unique
+
+ setTimeout(() => {
+  setContent('update')
+  setKey((prevKey) => prevKey + 1); // Change la clé pour recréer le composant
+
+ }, 1000);
   const onValueChange = useCallback(
     debounce((value) => {
       // Détecter et gérer les suppressions d'images
@@ -260,6 +267,7 @@ function TextEditor({onChange}) {
       }}
     >
       <RichTextEditor
+        key={key}
         output="html"
         content={content }
         onChangeContent={onValueChange}
