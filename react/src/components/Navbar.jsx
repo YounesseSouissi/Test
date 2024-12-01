@@ -9,13 +9,23 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Menu } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useUserContext } from '../UserContext'
 
-const Navbar= () => {
+const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false)
-
-  const handleLogout = () => {
+  const { user, setUser, setToken, logout } = useUserContext()
+  const handleLogout = async () => {
     // Implement logout logic here
-    console.log('Logging out...')
+    try {
+      const response = await logout()
+      if (response.status == 200) {
+        setToken('')
+        setUser('')
+      }
+    } catch (error) {
+      console.log(error);
+
+    }
   }
 
   return (
@@ -23,21 +33,21 @@ const Navbar= () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className='flex items-center '>
-          <div className="flex items-center mr-4">
-            <Link to="/" className="text-xl font-bold">
-              Logo
-            </Link>
-          </div>
-          <div className="hidden md:block">
-            <div className="flex items-center gap-4 text-sm xl:gap-6" >
-              <Link to="/blogs" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
-                Blogs
-              </Link>
-              <Link to="/create-blog" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
-                Create Blog
+            <div className="flex items-center mr-4">
+              <Link to="/" className="text-xl font-bold">
+                Logo
               </Link>
             </div>
-          </div>
+            <div className="hidden md:block">
+              <div className="flex items-center gap-4 text-sm xl:gap-6" >
+                <Link to="/blogs" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                  Blogs
+                </Link>
+                <Link to="/create-blog" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                  Create Blog
+                </Link>
+              </div>
+            </div>
 
           </div>
           <div className="hidden md:block">
@@ -46,14 +56,22 @@ const Navbar= () => {
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="/avatars/01.png" alt="@username" />
-                    <AvatarFallback>UN</AvatarFallback>
+                    <AvatarFallback>{user && user.name}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuItem onClick={handleLogout}>
+                {user ? (<DropdownMenuItem onClick={handleLogout}>
                   Log out
-                </DropdownMenuItem>
+                </DropdownMenuItem>) : (
+                  <Link to={'/login'}>
+
+                    <DropdownMenuItem >
+                      Log in
+                    </DropdownMenuItem>
+                  </Link>
+                )}
+
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

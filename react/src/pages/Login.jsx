@@ -21,8 +21,11 @@ import {
 } from '../components/ui/card'
 import { Input } from '../components/ui/input'
 import { PasswordInput } from '../components/ui/password-input'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Loader } from 'lucide-react'
+import { useUserContext } from '../UserContext'
+import { toast } from 'sonner'
+import { useEffect } from 'react'
 
 // Improved schema with additional validation rules
 const formSchema = z.object({
@@ -41,41 +44,36 @@ export default function Login() {
       password: '',
     },
   })
+  const navigate=useNavigate()
+  const {login,token,setToken,setUser}=useUserContext()
+  
+  useEffect(()=>{
+    if(token){
+      navigate('/')
+    }
+  },[token])
+ 
 
-  async function onSubmit(values) {
-    // try {
-    //   // Assuming an async login function
-    //   console.log(values)
-    //   toast(
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-    //     </pre>,
-    //   )
-    // } catch (error) {
-    //   console.error('Form submission error', error)
-    //   toast.error('Failed to submit the form. Please try again.')
-    // }
-  }
   const { formState: { isSubmitting } } = form
-//   const onSubmit = async (values) => {
-//       try {
-//           const { data, status } = await login(values)
-//           setToken(data.token)
-//           setUser(data.data);
-//           if (status == 200) {
-//               navigate()
-//               toast.success(data.message)
-//           }
-//       } catch ({ response }) {
-//           if (response.status == 422) {
-//               Object.entries(response.data.errors).forEach(([key, value]) => {
-//                   form.setError(key, {
-//                       message: value
-//                   })
-//               })
-//           }
-//       }
-//   };
+  const onSubmit = async (values) => {
+      try {
+          const { data, status } = await login(values)
+          setToken(data.token)
+          setUser(data.data);
+          if (status == 200) {
+              navigate('/')
+              toast.success(data.message)
+          }
+      } catch ({ response }) {
+          if (response.status == 422) {
+              Object.entries(response.data.errors).forEach(([key, value]) => {
+                  form.setError(key, {
+                      message: value
+                  })
+              })
+          }
+      }
+  };
   return (
     <div className="flex flex-col min-h-[50vh] h-full w-full items-center justify-center px-4">
       <Card className="mx-auto max-w-sm">
