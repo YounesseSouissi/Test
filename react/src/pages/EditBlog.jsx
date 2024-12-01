@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
@@ -8,38 +8,59 @@ import { Label } from "../components/ui/label"
 import { Textarea } from "../components/ui/textarea"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../components/ui/card"
 import TextEditor from '../components/TextEditor'
+import { set } from 'react-hook-form'
 
-const CreateBlog = () => {
+const EditBlog = () => {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [content, setContent] = useState('')
   const navigate = useNavigate()
-
+  const getBlog=async (id)=>{
+    try {
+      const response=await fetch('http://localhost:8000/api/blogs/'+id,{
+        method:'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data=await response.json()
+      return data
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
+useEffect(() => {
+  getBlog(14).then((response) => {
+    const data=response
+    console.log(data);
+  
+    if(data){
+      setTitle(data.title)
+      setDescription(data.description)
+      setContent(data.content)
+    }
+  })
+ 
+}, [])
   const handleSubmit = async (e) => {
     e.preventDefault()
     
     // Here you would typically make an API call to your server
     // For this example, we'll just log the data
- 
-      fetch('http://localhost:8000/api/blogs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title, description, content }),
-      }).then((response) => {
-        return response.json()
-      }).then((data) => {
-          console.log(data);
-          setTitle('')
-          setDescription('')
-          setContent('')
-          
+    fetch('http://localhost:8000/api/blogs/14', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ title, description, content }),
+    }).then((response) => {
+      return response.json()
+    }).then((data) => {
+        console.log(data);
         
-      })
-
-    
-   
+      
+    })
     // Simulate an API call
 
     // Redirect to the blogs page after submission
@@ -83,5 +104,5 @@ const CreateBlog = () => {
   )
 }
 
-export default CreateBlog
+export default EditBlog
 

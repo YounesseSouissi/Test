@@ -4,6 +4,7 @@ import Layout from './components/Layout'
 import Home from './pages/Home'
 import CreateBlog from './pages/CreateBlog'
 import Login from './pages/Login'
+import EditBlog from './pages/EditBlog'
 
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/create-blog" element={<CreateBlog />} />
+          <Route path="/edit-blog" element={<EditBlog />} />
           <Route path="/login" element={<Login />} />
         </Routes>
       </Layout>

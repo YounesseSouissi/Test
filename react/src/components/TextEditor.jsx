@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import RichTextEditor, {
   Attachment,
   BaseKit,
@@ -210,19 +210,20 @@ const extensions = [
   }),
   Twitter,
 ]
-function TextEditor({onChange}) {
+function TextEditor({onChange,defaulteValue}) {
   const [content, setContent] = useState('')
   const [theme, setTheme] = useState('light')
   const [disable, setDisable] = useState(false)
-  const [key, setKey] = useState(0); // Ajout d'une clé unique
+const editorRef =useRef(null)
 
- setTimeout(() => {
-  setContent('update')
-  setKey((prevKey) => prevKey + 1); // Change la clé pour recréer le composant
-
- }, 1000);
+useEffect(() => {
+    editorRef.current.editor.commands.setContent(defaulteValue)
+      
+},[defaulteValue])
   const onValueChange = useCallback(
     debounce((value) => {
+      console.log('onValueChange',value);
+      
       // Détecter et gérer les suppressions d'images
       const currentImages = extractImageUrls(value);
       const previousImages = extractImageUrls(content);
@@ -251,8 +252,7 @@ function TextEditor({onChange}) {
             console.error('Erreur lors de la suppression de l’image:', error);
           });
       });
-
-      setContent(value);
+      setContent(value)
       onChange(value)
     }, 300),
 
@@ -267,7 +267,7 @@ function TextEditor({onChange}) {
       }}
     >
       <RichTextEditor
-        key={key}
+        ref={editorRef}
         output="html"
         content={content }
         onChangeContent={onValueChange}
@@ -275,10 +275,10 @@ function TextEditor({onChange}) {
         dark={theme === 'dark'}
         disabled={disable}
       />
-
+{/* 
       {typeof content === 'string' && (
               <div style={{ marginTop: 20 ,height: 200,width: '100%'}} dangerouslySetInnerHTML={{ __html: content }} />
-          )}
+          )} */}
     </div>
   )
 }
