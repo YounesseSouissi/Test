@@ -8,11 +8,13 @@ import { Label } from "../components/ui/label"
 import { Textarea } from "../components/ui/textarea"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../components/ui/card"
 import TextEditor from '../components/TextEditor'
+import { Loader } from 'lucide-react'
 
 const CreateBlog = () => {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [content, setContent] = useState('')
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
@@ -20,7 +22,7 @@ const CreateBlog = () => {
     
     // Here you would typically make an API call to your server
     // For this example, we'll just log the data
- 
+ setLoading(true)
       fetch('http://localhost:8000/api/blogs', {
         method: 'POST',
         headers: {
@@ -30,6 +32,8 @@ const CreateBlog = () => {
       }).then((response) => {
         return response.json()
       }).then((data) => {
+        setLoading(false)
+        navigate('/edit-blog/'+data.blog.id)
           console.log(data);
           setTitle('')
           setDescription('')
@@ -75,7 +79,7 @@ const CreateBlog = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">Create Blog Post</Button>
+            <Button type="submit" className="w-full">{loading ? <p><Loader className='animate-spin' /> Creating...</p>: 'Create Blog Post'}</Button>
           </CardFooter>
         </form>
       </Card>

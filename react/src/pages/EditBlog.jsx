@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import { Button } from "../components/ui/button"
@@ -30,8 +30,9 @@ const EditBlog = () => {
       
     }
   }
+  const {id}=useParams()
 useEffect(() => {
-  getBlog(14).then((response) => {
+  getBlog(id).then((response) => {
     const data=response
     console.log(data);
   

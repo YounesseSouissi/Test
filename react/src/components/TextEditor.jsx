@@ -217,6 +217,7 @@ function TextEditor({onChange,defaulteValue}) {
 const editorRef =useRef(null)
 
 useEffect(() => {
+  setContent(defaulteValue)
     editorRef.current.editor.commands.setContent(defaulteValue)
       
 },[defaulteValue])
