@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import ReactQuill from 'react-quill'
+import { Link, useNavigate } from 'react-router-dom'
 import 'react-quill/dist/quill.snow.css'
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
@@ -9,6 +8,15 @@ import { Textarea } from "../components/ui/textarea"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../components/ui/card"
 import TextEditor from '../components/TextEditor'
 import { Loader } from 'lucide-react'
+import { ContentLayout } from '../components/content-layout'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "../components/ui/breadcrumb";
 
 const CreateBlog = () => {
   const [title, setTitle] = useState('')
@@ -50,8 +58,27 @@ const CreateBlog = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Card>
+    <ContentLayout title="Create Blog Post">
+          <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/dashboard">Dashboard</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Account</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <Card className="mt-6">
         <CardHeader>
           <CardTitle>Create a New Blog Post</CardTitle>
         </CardHeader>
@@ -83,7 +110,7 @@ const CreateBlog = () => {
           </CardFooter>
         </form>
       </Card>
-    </div>
+    </ContentLayout>
   )
 }
 

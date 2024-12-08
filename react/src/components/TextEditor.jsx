@@ -262,10 +262,8 @@ useEffect(() => {
 
   return (
     <div
-      className="flex flex-col w-full max-w-screen-lg gap-[24px]  my-0"
-      style={{
-        maxWidth: 1024,
-      }}
+      className="flex flex-col w-[100%]  my-0"
+     
     >
       <RichTextEditor
         ref={editorRef}

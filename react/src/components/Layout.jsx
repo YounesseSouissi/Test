@@ -1,16 +1,31 @@
-import React from 'react'
-import Navbar from './Navbar'
 
-const Layout= ({ children }) => {
+import { Sidebar } from "./Sidebar";
+import { useSidebar } from "./hooks/use-sidebar";
+import { useStore } from "./hooks/use-store";
+import { cn } from "../lib/utils";
+
+export default function Layout({children}) {
+  const sidebar = useStore(useSidebar, (x) => x);
+  if (!sidebar) return null;
+  const { getOpenState, settings } = sidebar;
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="container mx-auto px-4 py-8">
+    <>
+      <Sidebar />
+      <main
+        className={cn(
+          "min-h-[calc(100vh_-_56px)] bg-zinc-50 dark:bg-zinc-900 transition-[margin-left] ease-in-out duration-300",
+          !settings.disabled && (!getOpenState() ? "lg:ml-[90px]" : "lg:ml-72")
+        )}
+      >
         {children}
       </main>
-    </div>
-  )
+      <footer
+        className={cn(
+          "transition-[margin-left] ease-in-out duration-300",
+          !settings.disabled && (!getOpenState() ? "lg:ml-[90px]" : "lg:ml-72")
+        )}
+      >
+      </footer>
+    </>
+  );
 }
-
-export default Layout
-
